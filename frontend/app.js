@@ -62,3 +62,50 @@ launchButtons.forEach((button) => {
     }
 
 });
+// ==========================================
+// AGENTSHIELD TRUST ANALYSIS
+// ==========================================
+
+const demoTrustData = {
+    service: "Weather Intelligence API",
+    trust_score: 94,
+    risk_level: "LOW",
+    reputation: 97,
+    reliability: 92,
+    verification: 100,
+    price_fairness: 88,
+    decision: "APPROVE",
+    payment_protocol: "x402"
+};
+
+
+const analyzeButtons = document.querySelectorAll(".analyze-btn");
+
+analyzeButtons.forEach((button) => {
+
+    button.addEventListener("click", () => {
+
+        button.textContent = "Analyzing...";
+
+        setTimeout(() => {
+
+            button.textContent = "Trust: " + demoTrustData.trust_score + "/100";
+
+            alert(
+                "AGENTSHIELD TRUST ANALYSIS\n\n" +
+                "Service: " + demoTrustData.service + "\n" +
+                "Trust Score: " + demoTrustData.trust_score + "/100\n" +
+                "Risk: " + demoTrustData.risk_level + "\n" +
+                "Reputation: " + demoTrustData.reputation + "%\n" +
+                "Reliability: " + demoTrustData.reliability + "%\n" +
+                "Verification: " + demoTrustData.verification + "%\n" +
+                "Price Fairness: " + demoTrustData.price_fairness + "%\n\n" +
+                "Decision: " + demoTrustData.decision + "\n" +
+                "Payment: " + demoTrustData.payment_protocol
+            );
+
+        }, 800);
+
+    });
+
+});

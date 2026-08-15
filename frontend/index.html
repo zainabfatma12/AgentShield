@@ -171,6 +171,243 @@
 
 
     <script src="app.js"></script>
+<section class="dashboard-section" id="dashboard">
 
+    <div class="dashboard-header">
+        <div>
+            <p class="section-label">AGENT CONTROL CENTER</p>
+            <h2>AgentShield Dashboard</h2>
+            <p>
+                Monitor autonomous agents, analyze service trust,
+                and control payment decisions.
+            </p>
+        </div>
+
+        <div class="agent-status">
+            <span class="status-dot"></span>
+            Agent Online
+        </div>
+    </div>
+
+
+    <div class="dashboard-grid">
+
+        <!-- Trust Score -->
+        <div class="dashboard-card trust-card">
+
+            <div class="card-title">
+                <span>Trust Score</span>
+                <span>●</span>
+            </div>
+
+            <div class="trust-score">
+                94<span>/100</span>
+            </div>
+
+            <div class="risk-low">
+                LOW RISK
+            </div>
+
+            <p>
+                AgentShield currently considers the selected
+                service provider trustworthy.
+            </p>
+
+        </div>
+
+
+        <!-- Reputation -->
+        <div class="dashboard-card">
+
+            <div class="card-title">
+                <span>Reputation</span>
+            </div>
+
+            <div class="metric-value">
+                97%
+            </div>
+
+            <p>Provider reputation score</p>
+
+        </div>
+
+
+        <!-- Payment -->
+        <div class="dashboard-card">
+
+            <div class="card-title">
+                <span>Payment Protocol</span>
+            </div>
+
+            <div class="metric-value">
+                x402
+            </div>
+
+            <p>Machine-to-machine payments</p>
+
+        </div>
+
+
+        <!-- Decision -->
+        <div class="dashboard-card">
+
+            <div class="card-title">
+                <span>Agent Decision</span>
+            </div>
+
+            <div class="decision-approved">
+                APPROVED ✓
+            </div>
+
+            <p>
+                Payment can proceed safely.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- Service Marketplace -->
+
+    <div class="services-section">
+
+        <div class="services-header">
+
+            <div>
+                <p class="section-label">SERVICE DISCOVERY</p>
+                <h2>Trusted Services</h2>
+            </div>
+
+            <button class="refresh-btn">
+                Refresh Services
+            </button>
+
+        </div>
+
+
+        <div class="service-grid">
+
+
+            <!-- Service 1 -->
+
+            <div class="service-card">
+
+                <div class="service-top">
+
+                    <div class="service-icon">
+                        ☁
+                    </div>
+
+                    <span class="verified">
+                        ✓ VERIFIED
+                    </span>
+
+                </div>
+
+                <h3>Weather Intelligence API</h3>
+
+                <p>
+                    Real-time weather data for autonomous agents.
+                </p>
+
+
+                <div class="service-stats">
+
+                    <div>
+                        <span>Trust</span>
+                        <strong>94/100</strong>
+                    </div>
+
+                    <div>
+                        <span>Risk</span>
+                        <strong>LOW</strong>
+                    </div>
+
+                    <div>
+                        <span>Price</span>
+                        <strong>$0.002</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="service-actions">
+
+                    <button class="analyze-btn">
+                        Analyze Trust
+                    </button>
+
+                    <button class="use-btn">
+                        Use Service
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Service 2 -->
+
+            <div class="service-card">
+
+                <div class="service-top">
+
+                    <div class="service-icon">
+                        🔍
+                    </div>
+
+                    <span class="verified">
+                        ✓ VERIFIED
+                    </span>
+
+                </div>
+
+                <h3>AI Search API</h3>
+
+                <p>
+                    Search and information retrieval for AI agents.
+                </p>
+
+
+                <div class="service-stats">
+
+                    <div>
+                        <span>Trust</span>
+                        <strong>88/100</strong>
+                    </div>
+
+                    <div>
+                        <span>Risk</span>
+                        <strong>LOW</strong>
+                    </div>
+
+                    <div>
+                        <span>Price</span>
+                        <strong>$0.005</strong>
+                    </div>
+
+                </div>
+
+
+                <div class="service-actions">
+
+                    <button class="analyze-btn">
+                        Analyze Trust
+                    </button>
+
+                    <button class="use-btn">
+                        Use Service
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
 </body>
 </html>
