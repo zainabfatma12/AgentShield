@@ -2,12 +2,19 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from backend.trust_engine import calculate_trust_score, make_decision
+from backend.database import (
+    initialize_database,
+    save_transaction,
+    get_transactions
+)
 
 app = FastAPI(
     title="AgentShield API",
     description="Trust infrastructure for autonomous AI commerce",
     version="0.2.0"
 )
+
+initialize_database()
 
 class AnalyzeRequest(BaseModel):
     reputation: float
@@ -100,8 +107,21 @@ def authorize_transaction(request: AuthorizeRequest):
     # Step 2: Ask the AgentShield Decision Engine
     decision = make_decision(result["trust_score"])
 
-    # Step 3: Return the authorization decision
+    # Step 3: Save the transaction
+    transaction_id = save_transaction(
+        service="AgentShield Provider",
+        trust_score=result["trust_score"],
+        risk_level=decision["risk_level"],
+        decision=decision["decision"],
+        amount=request.price,
+        payment_protocol="x402",
+        authorized=decision["authorized"],
+        reason=decision["reason"]
+    )
+    
+    # Step 4: Return the authorization decision
     return {
+        "transaction_id": transaction_id,
         "authorized": decision["authorized"],
         "decision": decision["decision"],
         "risk_level": decision["risk_level"],
@@ -109,6 +129,7 @@ def authorize_transaction(request: AuthorizeRequest):
         "reason": decision["reason"],
         "payment_protocol": "x402"
     }
+
 @app.get("/health")
 def health():
     return {
@@ -172,4 +193,13 @@ def get_trust():
         "price": service["price"],
         "payment_protocol": "x402",
         "decision": decision
+    }
+# -------------------------
+# Transaction History
+# -------------------------
+
+@app.get("/transactions")
+def transactions():
+    return {
+        "transactions": get_transactions()
     }
