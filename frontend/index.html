@@ -170,7 +170,7 @@
     </footer>
 
 
-    <script src="app.js"></script>
+    
 <section class="dashboard-section" id="dashboard">
 
     <div class="dashboard-header">
@@ -266,6 +266,145 @@
         </div>
 
     </div>
+    <!-- ==========================================
+     AGENTSHIELD TRANSACTION HISTORY
+     ========================================== -->
+
+<section class="transaction-history">
+
+    <div class="section-header">
+
+        <div>
+            <h2>Transaction History</h2>
+
+            <p>
+                Monitor autonomous agent payment decisions
+                protected by AgentShield.
+            </p>
+        </div>
+
+        <div class="transaction-count">
+            3 Transactions
+        </div>
+
+    </div>
+
+
+    <div class="transaction-list" id="transactionList">
+
+        <!-- Transaction 1 -->
+
+        <div class="transaction-card approved">
+
+            <div class="transaction-icon">
+                ✓
+            </div>
+
+            <div class="transaction-info">
+
+                <h3>Weather Intelligence API</h3>
+
+                <p>
+                    x402 payment
+                </p>
+
+            </div>
+
+            <div class="transaction-trust">
+
+                <strong>94/100</strong>
+
+                <span>LOW RISK</span>
+
+            </div>
+
+            <div class="transaction-amount">
+
+                <strong>$0.001</strong>
+
+                <span>APPROVED</span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Transaction 2 -->
+
+        <div class="transaction-card review">
+
+            <div class="transaction-icon">
+                !
+            </div>
+
+            <div class="transaction-info">
+
+                <h3>Market Intelligence API</h3>
+
+                <p>
+                    x402 payment
+                </p>
+
+            </div>
+
+            <div class="transaction-trust">
+
+                <strong>74/100</strong>
+
+                <span>MEDIUM RISK</span>
+
+            </div>
+
+            <div class="transaction-amount">
+
+                <strong>$0.005</strong>
+
+                <span>REVIEW</span>
+
+            </div>
+
+        </div>
+
+
+        <!-- Transaction 3 -->
+
+        <div class="transaction-card blocked">
+
+            <div class="transaction-icon">
+                ×
+            </div>
+
+            <div class="transaction-info">
+
+                <h3>Unknown Data Provider</h3>
+
+                <p>
+                    x402 payment
+                </p>
+
+            </div>
+
+            <div class="transaction-trust">
+
+                <strong>42/100</strong>
+
+                <span>HIGH RISK</span>
+
+            </div>
+
+            <div class="transaction-amount">
+
+                <strong>$0.05</strong>
+
+                <span>BLOCKED</span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
 
 
     <!-- Service Marketplace -->
@@ -409,5 +548,195 @@
     </div>
 
 </section>
+<!-- ==========================================
+     AGENTSHIELD TRUST ANALYSIS MODAL
+========================================== -->
+
+<div class="trust-modal" id="trustModal">
+
+    <div class="trust-modal-content">
+
+        <button class="close-modal" id="closeTrustModal">
+            ×
+        </button>
+
+        <div class="trust-modal-header">
+
+            <p class="section-label">
+                AGENTSHIELD SECURITY ANALYSIS
+            </p>
+
+            <h2>Trust Analysis</h2>
+
+            <p id="analysisService">
+                Weather Intelligence API
+            </p>
+
+        </div>
+
+
+        <!-- TRUST SCORE -->
+
+        <div class="trust-result">
+
+            <div class="trust-score-large">
+                <span id="analysisScore">94</span>
+                <small>/100</small>
+            </div>
+
+            <div
+                class="analysis-risk"
+                id="analysisRisk"
+            >
+                LOW RISK
+            </div>
+
+        </div>
+
+
+        <!-- TRUST FACTORS -->
+
+        <div class="trust-factors">
+
+            <div class="factor">
+
+                <div class="factor-header">
+                    <span>Reputation</span>
+                    <strong id="analysisReputation">
+                        95%
+                    </strong>
+                </div>
+
+                <div class="factor-bar">
+                    <div
+                        id="reputationBar"
+                        class="factor-fill"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="factor">
+
+                <div class="factor-header">
+                    <span>Reliability</span>
+                    <strong id="analysisReliability">
+                        92%
+                    </strong>
+                </div>
+
+                <div class="factor-bar">
+                    <div
+                        id="reliabilityBar"
+                        class="factor-fill"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="factor">
+
+                <div class="factor-header">
+                    <span>Verification</span>
+                    <strong id="analysisVerification">
+                        100%
+                    </strong>
+                </div>
+
+                <div class="factor-bar">
+                    <div
+                        id="verificationBar"
+                        class="factor-fill"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="factor">
+
+                <div class="factor-header">
+                    <span>Price Fairness</span>
+                    <strong id="analysisPrice">
+                        88%
+                    </strong>
+                </div>
+
+                <div class="factor-bar">
+                    <div
+                        id="priceBar"
+                        class="factor-fill"
+                    ></div>
+                </div>
+
+            </div>
+
+
+            <div class="factor">
+
+                <div class="factor-header">
+                    <span>Transaction History</span>
+                    <strong id="analysisTransactions">
+                        90%
+                    </strong>
+                </div>
+
+                <div class="factor-bar">
+                    <div
+                        id="transactionBar"
+                        class="factor-fill"
+                    ></div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- DECISION -->
+
+        <div class="analysis-decision">
+
+            <div>
+
+                <span class="decision-label">
+                    AGENT DECISION
+                </span>
+
+                <strong id="analysisDecision">
+                    APPROVE
+                </strong>
+
+            </div>
+
+
+            <div class="payment-badge">
+
+                x402
+
+            </div>
+
+        </div>
+
+
+        <!-- PAYMENT BUTTON -->
+
+        <button
+            class="proceed-payment-btn"
+            id="proceedPaymentBtn"
+        >
+
+            Proceed with x402 Payment →
+
+        </button>
+        <div id="authorizationResult" class="authorization-result"></div>
+
+    </div>
+
+</div>
+<script src="app.js"></script>
+
 </body>
 </html>

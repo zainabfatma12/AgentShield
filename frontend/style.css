@@ -498,3 +498,185 @@ footer {
     }
 
 }
+/* ==========================================
+   AGENTSHIELD TRUST ANALYSIS MODAL
+========================================== */
+
+.trust-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+}
+
+.trust-modal.active {
+    display: flex;
+}
+
+.trust-modal-content {
+    position: relative;
+    width: min(620px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 38px;
+    border-radius: 26px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: #0d1117;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+}
+
+.close-modal {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    color: inherit;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.trust-modal-header {
+    margin-bottom: 30px;
+}
+
+.trust-modal-header h2 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.trust-modal-header > p:last-child {
+    opacity: 0.55;
+}
+
+.trust-result {
+    text-align: center;
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.035);
+}
+
+.trust-score-large {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.trust-score-large small {
+    font-size: 20px;
+    opacity: 0.45;
+}
+
+.analysis-risk {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 7px 15px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #36e58c;
+    background: rgba(54,229,140,0.1);
+}
+
+.trust-factors {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.factor-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.factor-header strong {
+    font-size: 13px;
+}
+
+.factor-bar {
+    height: 7px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.08);
+}
+
+.factor-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: #36e58c;
+    transition: width 0.8s ease;
+}
+
+.analysis-decision {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(54,229,140,0.06);
+    border: 1px solid rgba(54,229,140,0.15);
+}
+
+.decision-label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    opacity: 0.5;
+    margin-bottom: 5px;
+}
+
+#analysisDecision {
+    font-size: 22px;
+    color: #36e58c;
+}
+
+.payment-badge {
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    background: rgba(255,255,255,0.08);
+}
+
+.proceed-payment-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    border: none;
+    border-radius: 13px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 800;
+    background: #36e58c;
+    color: #06100b;
+    transition: transform 0.2s ease;
+}
+
+.proceed-payment-btn:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+
+    .trust-modal-content {
+        padding: 25px;
+    }
+
+    .trust-score-large {
+        font-size: 52px;
+    }
+
+}
