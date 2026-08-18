@@ -1,0 +1,682 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #070b14;
+    color: #f5f7fb;
+    line-height: 1.6;
+}
+
+.navbar {
+    height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 7%;
+
+    border-bottom: 1px solid #1b2230;
+
+    background: rgba(7, 11, 20, 0.9);
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.navbar nav {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+.navbar a {
+    color: #aeb7c8;
+    text-decoration: none;
+}
+
+button {
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    border-radius: 10px;
+}
+
+.navbar button,
+.primary-btn {
+    padding: 13px 20px;
+    background: #ffffff;
+    color: #070b14;
+    font-weight: 700;
+}
+
+.hero {
+    min-height: 650px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 80px;
+
+    padding: 90px 8%;
+}
+
+.hero-content {
+    max-width: 680px;
+}
+
+.badge,
+.section-label {
+    color: #8e9bb2;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+.hero h1 {
+    font-size: clamp(48px, 6vw, 82px);
+    line-height: 1.02;
+    margin: 22px 0;
+}
+
+.hero h1 span,
+.section h2 span,
+.trust-section h2 span {
+    color: #7f8cff;
+}
+
+.hero-content > p {
+    max-width: 600px;
+    color: #aeb7c8;
+    font-size: 19px;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 35px;
+}
+
+.secondary-btn {
+    padding: 13px 20px;
+    color: #f5f7fb;
+    background: #141b29;
+    border: 1px solid #283246;
+}
+
+.trust-card {
+    width: 360px;
+    padding: 28px;
+
+    border: 1px solid #283246;
+    border-radius: 20px;
+
+    background: #0d1320;
+
+    box-shadow: 0 25px 80px rgba(0, 0, 0, 0.35);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+
+    color: #aeb7c8;
+    font-size: 14px;
+}
+
+.status {
+    color: #72e0a1;
+}
+
+.score {
+    margin-top: 50px;
+}
+
+.score strong {
+    font-size: 80px;
+}
+
+.score span {
+    color: #68758c;
+}
+
+.trust-label {
+    color: #68758c;
+    font-size: 12px;
+    letter-spacing: 2px;
+}
+
+.metrics {
+    margin-top: 35px;
+    display: grid;
+    gap: 15px;
+}
+
+.metrics div {
+    display: flex;
+    justify-content: space-between;
+
+    padding-bottom: 12px;
+
+    border-bottom: 1px solid #1c2636;
+}
+
+.metrics span {
+    color: #7f8ba0;
+}
+
+.metrics strong {
+    color: #ffffff;
+}
+
+.section {
+    padding: 100px 8%;
+    border-top: 1px solid #1b2230;
+}
+
+.section h2,
+.trust-section h2 {
+    font-size: 48px;
+    max-width: 800px;
+    margin: 15px 0 50px;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.step {
+    padding: 30px;
+    border: 1px solid #252e3e;
+    border-radius: 16px;
+    background: #0c121e;
+}
+
+.step span {
+    color: #71809a;
+}
+
+.step h3 {
+    margin: 20px 0 10px;
+    font-size: 24px;
+}
+
+.step p,
+.trust-section p {
+    color: #8995aa;
+}
+
+.trust-section {
+    padding: 120px 8%;
+    text-align: center;
+}
+
+.trust-section h2 {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.trust-section > p:last-child {
+    max-width: 700px;
+    margin: auto;
+}
+
+footer {
+    padding: 30px 8%;
+    border-top: 1px solid #1b2230;
+
+    display: flex;
+    justify-content: space-between;
+
+    color: #68758c;
+    font-size: 13px;
+}
+
+@media (max-width: 850px) {
+
+    .navbar nav a {
+        display: none;
+    }
+
+    .hero {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .trust-card {
+        width: 100%;
+    }
+
+    .steps {
+        grid-template-columns: 1fr;
+    }
+
+    footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+/* =========================
+   AGENTSHIELD DASHBOARD
+========================= */
+
+.dashboard-section {
+    padding: 90px 8%;
+}
+
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+.section-label {
+    font-size: 12px;
+    letter-spacing: 2px;
+    font-weight: 700;
+    opacity: 0.6;
+    margin-bottom: 8px;
+}
+
+.dashboard-header h2,
+.services-header h2 {
+    font-size: 34px;
+    margin-bottom: 10px;
+}
+
+.dashboard-header p {
+    max-width: 650px;
+}
+
+.agent-status {
+    padding: 12px 18px;
+    border: 1px solid rgba(0, 255, 150, 0.3);
+    border-radius: 30px;
+    white-space: nowrap;
+}
+
+.status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #36e58c;
+    margin-right: 8px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.dashboard-card {
+    padding: 25px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+}
+
+.card-title {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    opacity: 0.7;
+}
+
+.trust-score {
+    font-size: 42px;
+    font-weight: 800;
+}
+
+.trust-score span {
+    font-size: 16px;
+    opacity: 0.5;
+}
+
+.risk-low {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    background: rgba(54,229,140,0.12);
+    color: #36e58c;
+}
+
+.metric-value {
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.decision-approved {
+    font-size: 22px;
+    font-weight: 800;
+    color: #36e58c;
+}
+
+.services-section {
+    margin-top: 70px;
+}
+
+.services-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.refresh-btn,
+.analyze-btn,
+.use-btn {
+    padding: 11px 17px;
+    border-radius: 10px;
+    cursor: pointer;
+    border: none;
+    font-weight: 600;
+}
+
+.refresh-btn {
+    background: rgba(255,255,255,0.08);
+    color: inherit;
+}
+
+.service-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.service-card {
+    padding: 28px;
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.08);
+    background: rgba(255,255,255,0.03);
+}
+
+.service-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.service-icon {
+    font-size: 28px;
+}
+
+.verified {
+    font-size: 11px;
+    font-weight: 700;
+    color: #36e58c;
+}
+
+.service-card h3 {
+    margin-top: 20px;
+    font-size: 20px;
+}
+
+.service-card p {
+    opacity: 0.65;
+    line-height: 1.6;
+}
+
+.service-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin: 25px 0;
+    gap: 10px;
+}
+
+.service-stats div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.service-stats span {
+    font-size: 11px;
+    opacity: 0.5;
+}
+
+.service-stats strong {
+    font-size: 14px;
+}
+
+.service-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.analyze-btn {
+    background: rgba(255,255,255,0.08);
+    color: inherit;
+}
+
+.use-btn {
+    background: #36e58c;
+    color: #06100b;
+}
+
+@media (max-width: 900px) {
+
+    .dashboard-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .service-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media (max-width: 600px) {
+
+    .dashboard-header,
+    .services-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .service-stats {
+        grid-template-columns: 1fr;
+    }
+
+}
+/* ==========================================
+   AGENTSHIELD TRUST ANALYSIS MODAL
+========================================== */
+
+.trust-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(10px);
+    z-index: 9999;
+}
+
+.trust-modal.active {
+    display: flex;
+}
+
+.trust-modal-content {
+    position: relative;
+    width: min(620px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 38px;
+    border-radius: 26px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: #0d1117;
+    box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+}
+
+.close-modal {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.07);
+    color: inherit;
+    font-size: 25px;
+    cursor: pointer;
+}
+
+.trust-modal-header {
+    margin-bottom: 30px;
+}
+
+.trust-modal-header h2 {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.trust-modal-header > p:last-child {
+    opacity: 0.55;
+}
+
+.trust-result {
+    text-align: center;
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.035);
+}
+
+.trust-score-large {
+    font-size: 64px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.trust-score-large small {
+    font-size: 20px;
+    opacity: 0.45;
+}
+
+.analysis-risk {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 7px 15px;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #36e58c;
+    background: rgba(54,229,140,0.1);
+}
+
+.trust-factors {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.factor-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.factor-header strong {
+    font-size: 13px;
+}
+
+.factor-bar {
+    height: 7px;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.08);
+}
+
+.factor-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: inherit;
+    background: #36e58c;
+    transition: width 0.8s ease;
+}
+
+.analysis-decision {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 30px;
+    padding: 20px;
+    border-radius: 16px;
+    background: rgba(54,229,140,0.06);
+    border: 1px solid rgba(54,229,140,0.15);
+}
+
+.decision-label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    opacity: 0.5;
+    margin-bottom: 5px;
+}
+
+#analysisDecision {
+    font-size: 22px;
+    color: #36e58c;
+}
+
+.payment-badge {
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 800;
+    background: rgba(255,255,255,0.08);
+}
+
+.proceed-payment-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 15px;
+    border: none;
+    border-radius: 13px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 800;
+    background: #36e58c;
+    color: #06100b;
+    transition: transform 0.2s ease;
+}
+
+.proceed-payment-btn:hover {
+    transform: translateY(-2px);
+}
+
+@media (max-width: 600px) {
+
+    .trust-modal-content {
+        padding: 25px;
+    }
+
+    .trust-score-large {
+        font-size: 52px;
+    }
+
+}
