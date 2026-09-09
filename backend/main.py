@@ -72,27 +72,6 @@ def root():
         "message": "Trust layer for autonomous commerce"
     }
 
-@app.post("/analyze")
-def analyze_service(request: AnalyzeRequest):
-
-    result = calculate_trust_score(
-        reputation=request.reputation,
-        successful_transactions=request.successful_transactions,
-        verified=request.verified,
-        price=request.price
-    )
-
-    return {
-        "service": "AgentShield Analysis",
-        "reputation": request.reputation,
-        "successful_transactions": request.successful_transactions,
-        "verified": request.verified,
-        "price": request.price,
-        "trust_score": result["trust_score"],
-        "risk_level": result["risk_level"],
-        "decision": result["decision"],
-        "payment_protocol": "x402"
-    }
 @app.post("/authorize")
 def authorize_transaction(request: AuthorizeRequest):
 
