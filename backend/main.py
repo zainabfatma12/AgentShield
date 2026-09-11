@@ -1,3 +1,4 @@
+from backend.authorization import authorize_transaction
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -23,10 +24,12 @@ class AnalyzeRequest(BaseModel):
     price: float
 
 class AuthorizeRequest(BaseModel):
+    service: str
     reputation: float
     successful_transactions: int
     verified: bool
     price: float
+    amount: float
 
 @app.post("/analyze")
 def analyze_service(request: AnalyzeRequest):
@@ -54,12 +57,48 @@ def analyze_service(request: AnalyzeRequest):
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
+DEMO_PROVIDERS = [
+    {
+        "id": "weather-pro",
+        "name": "Weather Intelligence API",
+        "description": "Reliable real-time weather intelligence",
+        "reputation": 98,
+        "successful_transactions": 127,
+        "verified": True,
+        "price": 0.001,
+        "payment_protocol": "x402"
+    },
+    {
+        "id": "fast-weather",
+        "name": "FastWeather API",
+        "description": "Fast weather data with moderate reputation",
+        "reputation": 74,
+        "successful_transactions": 70,
+        "verified": True,
+        "price": 0.005,
+        "payment_protocol": "x402"
+    },
+    {
+        "id": "unknown-weather",
+        "name": "UnknownWeather API",
+        "description": "Unverified weather service",
+        "reputation": 25,
+        "successful_transactions": 3,
+        "verified": False,
+        "price": 0.05,
+        "payment_protocol": "x402"
+    }
+]
+@app.get("/providers")
+def get_providers():
+    return {
+        "providers": DEMO_PROVIDERS
+    }
 # -------------------------
 # Basic endpoints
 # -------------------------
@@ -73,9 +112,9 @@ def root():
     }
 
 @app.post("/authorize")
-def authorize_transaction(request: AuthorizeRequest):
+def authorize(request: AuthorizeRequest):
 
-    # Step 1: Calculate the provider's trust score
+    # 1. Calculate provider trust
     result = calculate_trust_score(
         reputation=request.reputation,
         successful_transactions=request.successful_transactions,
@@ -83,28 +122,33 @@ def authorize_transaction(request: AuthorizeRequest):
         price=request.price
     )
 
-    # Step 2: Ask the AgentShield Decision Engine
-    decision = make_decision(result["trust_score"])
+    # 2. Apply transaction authorization policy
+    decision = authorize_transaction(
+        trust_score=result["trust_score"],
+        amount=request.amount
+    )
 
-    # Step 3: Save the transaction
+    # 3. Save audit record
     transaction_id = save_transaction(
-        service="AgentShield Provider",
+        service=request.service,
         trust_score=result["trust_score"],
         risk_level=decision["risk_level"],
         decision=decision["decision"],
-        amount=request.price,
+        amount=request.amount,
         payment_protocol="x402",
         authorized=decision["authorized"],
         reason=decision["reason"]
     )
-    
-    # Step 4: Return the authorization decision
+
+    # 4. Return decision to frontend
     return {
         "transaction_id": transaction_id,
+        "service": request.service,
         "authorized": decision["authorized"],
         "decision": decision["decision"],
         "risk_level": decision["risk_level"],
         "trust_score": result["trust_score"],
+        "amount": request.amount,
         "reason": decision["reason"],
         "payment_protocol": "x402"
     }
