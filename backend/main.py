@@ -1,6 +1,11 @@
+import os
+
+from dotenv import load_dotenv
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
 from backend.trust_engine import calculate_trust_score, make_decision
 from backend.database import (
     initialize_database,
@@ -8,49 +13,106 @@ from backend.database import (
     get_transactions
 )
 
+# x402 imports
+from x402.http import (
+    FacilitatorConfig,
+    HTTPFacilitatorClient,
+    PaymentOption
+)
+from x402.http.middleware.fastapi import PaymentMiddlewareASGI
+from x402.http.types import RouteConfig
+from x402.mechanisms.evm.exact import ExactEvmServerScheme
+from x402.server import x402ResourceServer
+
+
+# --------------------------------
+# Load environment variables
+# --------------------------------
+
+load_dotenv("backend/.env")
+
+PAY_TO = os.getenv("PAY_TO")
+
+if not PAY_TO:
+    raise ValueError(
+        "PAY_TO is missing. Add your wallet address to backend/.env"
+    )
+
+FACILITATOR_URL = os.getenv(
+    "FACILITATOR_URL",
+    "https://x402.org/facilitator"
+)
+
+EVM_NETWORK = "eip155:84532"
+
+
+# --------------------------------
+# Create FastAPI app
+# --------------------------------
+
 app = FastAPI(
     title="AgentShield API",
     description="Trust infrastructure for autonomous AI commerce",
-    version="0.2.0"
+    version="0.3.0"
 )
+
+
+# --------------------------------
+# Database
+# --------------------------------
 
 initialize_database()
 
-class AnalyzeRequest(BaseModel):
-    reputation: float
-    successful_transactions: int
-    verified: bool
-    price: float
 
-class AuthorizeRequest(BaseModel):
-    reputation: float
-    successful_transactions: int
-    verified: bool
-    price: float
+# --------------------------------
+# x402 configuration
+# --------------------------------
 
-@app.post("/analyze")
-def analyze_service(request: AnalyzeRequest):
-
-    result = calculate_trust_score(
-        reputation=request.reputation,
-        successful_transactions=request.successful_transactions,
-        verified=request.verified,
-        price=request.price
+facilitator = HTTPFacilitatorClient(
+    FacilitatorConfig(
+        url=FACILITATOR_URL
     )
+)
 
-    return {
-        "service": "AgentShield Analysis",
-        "reputation": request.reputation,
-        "successful_transactions": request.successful_transactions,
-        "verified": request.verified,
-        "price": request.price,
-        "trust_score": result["trust_score"],
-        "risk_level": result["risk_level"],
-        "decision": result["decision"],
-        "payment_protocol": "x402"
-    }
+x402_server = x402ResourceServer(facilitator)
 
-# Allow the frontend to communicate with the backend
+x402_server.register(
+    EVM_NETWORK,
+    ExactEvmServerScheme()
+)
+
+
+# --------------------------------
+# x402 protected routes
+# --------------------------------
+
+routes = {
+    "POST /analyze": RouteConfig(
+        accepts=[
+            PaymentOption(
+                scheme="exact",
+                pay_to=PAY_TO,
+                price="$0.001",
+                network=EVM_NETWORK
+            )
+        ],
+        mime_type="application/json",
+        description="AgentShield trust analysis"
+    )
+}
+
+
+app.add_middleware(
+    PaymentMiddlewareASGI,
+    routes=routes,
+    server=x402_server
+)
+
+
+# --------------------------------
+# CORS
+# --------------------------------
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -60,17 +122,41 @@ app.add_middleware(
 )
 
 
-# -------------------------
-# Basic endpoints
-# -------------------------
+# --------------------------------
+# Request models
+# --------------------------------
+
+class AnalyzeRequest(BaseModel):
+    reputation: float
+    successful_transactions: int
+    verified: bool
+    price: float
+
+
+class AuthorizeRequest(BaseModel):
+    reputation: float
+    successful_transactions: int
+    verified: bool
+    price: float
+
+
+# --------------------------------
+# Basic endpoint
+# --------------------------------
 
 @app.get("/")
 def root():
     return {
         "name": "AgentShield",
         "status": "online",
-        "message": "Trust layer for autonomous commerce"
+        "message": "Trust layer for autonomous commerce",
+        "payment_protocol": "x402"
     }
+
+
+# --------------------------------
+# Analyze endpoint
+# --------------------------------
 
 @app.post("/analyze")
 def analyze_service(request: AnalyzeRequest):
@@ -93,10 +179,17 @@ def analyze_service(request: AnalyzeRequest):
         "decision": result["decision"],
         "payment_protocol": "x402"
     }
+
+
+# --------------------------------
+# Authorize transaction
+# --------------------------------
+
 @app.post("/authorize")
 def authorize_transaction(request: AuthorizeRequest):
 
-    # Step 1: Calculate the provider's trust score
+    # Step 1: Calculate trust score
+
     result = calculate_trust_score(
         reputation=request.reputation,
         successful_transactions=request.successful_transactions,
@@ -104,10 +197,14 @@ def authorize_transaction(request: AuthorizeRequest):
         price=request.price
     )
 
-    # Step 2: Ask the AgentShield Decision Engine
-    decision = make_decision(result["trust_score"])
+    # Step 2: Ask AgentShield decision engine
 
-    # Step 3: Save the transaction
+    decision = make_decision(
+        result["trust_score"]
+    )
+
+    # Step 3: Save transaction
+
     transaction_id = save_transaction(
         service="AgentShield Provider",
         trust_score=result["trust_score"],
@@ -118,8 +215,9 @@ def authorize_transaction(request: AuthorizeRequest):
         authorized=decision["authorized"],
         reason=decision["reason"]
     )
-    
-    # Step 4: Return the authorization decision
+
+    # Step 4: Return authorization decision
+
     return {
         "transaction_id": transaction_id,
         "authorized": decision["authorized"],
@@ -130,6 +228,11 @@ def authorize_transaction(request: AuthorizeRequest):
         "payment_protocol": "x402"
     }
 
+
+# --------------------------------
+# Health check
+# --------------------------------
+
 @app.get("/health")
 def health():
     return {
@@ -137,9 +240,9 @@ def health():
     }
 
 
-# -------------------------
-# Trust Engine
-# -------------------------
+# --------------------------------
+# Trust Engine demo
+# --------------------------------
 
 @app.get("/trust")
 def get_trust():
@@ -152,33 +255,45 @@ def get_trust():
         "verified": True
     }
 
-    # Calculate trust score
+    # Start score
+
     score = 0
 
-    # Reputation contributes up to 40 points
+    # Reputation: maximum 40 points
+
     score += service["reputation"] * 0.4
 
-    # Transaction history contributes up to 20 points
-    transaction_score = min(service["successful_transactions"] / 5, 20)
+    # Transaction history: maximum 20 points
+
+    transaction_score = min(
+        service["successful_transactions"] / 5,
+        20
+    )
+
     score += transaction_score
 
-    # Verification contributes 20 points
+    # Verification: 20 points
+
     if service["verified"]:
         score += 20
 
-    # Low price contributes 20 points
+    # Low price: 20 points
+
     if service["price"] <= 0.001:
         score += 20
 
     score = round(score)
 
     # Determine risk
+
     if score >= 80:
         risk_level = "LOW"
         decision = "APPROVE"
+
     elif score >= 60:
         risk_level = "MEDIUM"
         decision = "REVIEW"
+
     else:
         risk_level = "HIGH"
         decision = "BLOCK"
@@ -194,12 +309,15 @@ def get_trust():
         "payment_protocol": "x402",
         "decision": decision
     }
-# -------------------------
-# Transaction History
-# -------------------------
+
+
+# --------------------------------
+# Transaction history
+# --------------------------------
 
 @app.get("/transactions")
 def transactions():
+
     return {
         "transactions": get_transactions()
     }
