@@ -1,4 +1,5 @@
 from backend.authorization import authorize_transaction
+from backend.algorand import send_algorand_payment
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -226,3 +227,15 @@ def transactions():
     return {
         "transactions": get_transactions()
     }
+# -------------------------
+# Algorand Settlement
+# -------------------------
+
+@app.post("/settle-algorand")
+def settle_algorand(amount: float = 0.001):
+
+    result = send_algorand_payment(
+        amount_algo=amount
+    )
+
+    return result
