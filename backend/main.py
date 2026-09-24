@@ -332,3 +332,10 @@ def settle_algorand(amount: float = 0.001):
         amount_algo=amount
     )
     return result
+
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("backend.main:app", host="0.0.0.0", port=port, reload=False)
