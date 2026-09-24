@@ -1,3 +1,5 @@
+from typing import Any, Optional
+
 from backend.authorization import authorize_transaction
 from backend.algorand import send_algorand_payment
 from fastapi import FastAPI
@@ -7,52 +9,25 @@ from backend.trust_engine import calculate_trust_score, make_decision
 from backend.database import (
     initialize_database,
     save_transaction,
-    get_transactions
+    get_transactions,
+    get_providers as get_db_providers
+)
+from backend.network import get_network_config
+from backend.x402_payment import (
+    complete_browser_payment,
+    payment_status,
+    prepare_browser_payment,
+    skipped_payment
 )
 
 app = FastAPI(
     title="AgentShield API",
     description="Trust infrastructure for autonomous AI commerce",
-    version="0.2.0"
+    version="0.6.0"
 )
 
 initialize_database()
-
-class AnalyzeRequest(BaseModel):
-    reputation: float
-    successful_transactions: int
-    verified: bool
-    price: float
-
-class AuthorizeRequest(BaseModel):
-    service: str
-    reputation: float
-    successful_transactions: int
-    verified: bool
-    price: float
-    amount: float
-
-@app.post("/analyze")
-def analyze_service(request: AnalyzeRequest):
-
-    result = calculate_trust_score(
-        reputation=request.reputation,
-        successful_transactions=request.successful_transactions,
-        verified=request.verified,
-        price=request.price
-    )
-
-    return {
-        "service": "AgentShield Analysis",
-        "reputation": request.reputation,
-        "successful_transactions": request.successful_transactions,
-        "verified": request.verified,
-        "price": request.price,
-        "trust_score": result["trust_score"],
-        "risk_level": result["risk_level"],
-        "decision": result["decision"],
-        "payment_protocol": "x402"
-    }
+get_network_config()
 
 # Allow the frontend to communicate with the backend
 app.add_middleware(
@@ -62,6 +37,33 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class AnalyzeRequest(BaseModel):
+    reputation: float
+    successful_transactions: int
+    verified: bool
+    price: float
+    payer: Optional[str] = None
+    payment_group: Optional[list[str]] = None
+    accepted: Optional[dict[str, Any]] = None
+    payment_index: int = 1
+    resource: Optional[dict[str, Any]] = None
+
+
+class PreparePaymentRequest(BaseModel):
+    payer: str
+
+
+class AuthorizeRequest(BaseModel):
+    service: str
+    reputation: float
+    successful_transactions: int
+    verified: bool
+    price: float
+    amount: float
+    payment: Optional[dict[str, Any]] = None
+
 
 DEMO_PROVIDERS = [
     {
@@ -95,13 +97,10 @@ DEMO_PROVIDERS = [
         "payment_protocol": "x402"
     }
 ]
-@app.get("/providers")
-def get_providers():
-    return {
-        "providers": DEMO_PROVIDERS
-    }
+
+
 # -------------------------
-# Basic endpoints
+# Basic & Status endpoints
 # -------------------------
 
 @app.get("/")
@@ -112,9 +111,102 @@ def root():
         "message": "Trust layer for autonomous commerce"
     }
 
+
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy"
+    }
+
+
+@app.get("/providers")
+def get_providers():
+    db_providers = get_db_providers()
+    if db_providers:
+        return {"providers": db_providers}
+    return {
+        "providers": DEMO_PROVIDERS
+    }
+
+
+# -------------------------
+# Blockchain & Pera Wallet Payment
+# -------------------------
+
+@app.get("/payment/status")
+def get_payment_status():
+    return payment_status()
+
+
+@app.post("/payment/prepare")
+async def prepare_payment(request: PreparePaymentRequest):
+    """Build an unsigned x402 transaction group for Pera Wallet / browser wallet."""
+    try:
+        return await prepare_browser_payment(request.payer)
+    except Exception as exc:
+        return skipped_payment(str(exc), status="PREPARE_FAILED")
+
+
+# -------------------------
+# Trust Engine & Analysis
+# -------------------------
+
+@app.post("/analyze")
+def analyze_service(request: AnalyzeRequest):
+    """
+    Evaluates provider trust score.
+    If Pera Wallet signed transactions are provided, settles x402 payment first.
+    """
+    payment = None
+    if request.payer and request.payment_group and request.accepted:
+        import asyncio
+        payment = asyncio.run(complete_browser_payment(
+            payer=request.payer,
+            payment_group=request.payment_group,
+            accepted=request.accepted,
+            payment_index=request.payment_index,
+            resource=request.resource
+        ))
+
+        if not payment.get("success"):
+            return {
+                "service": "AgentShield Analysis",
+                "analyzed": False,
+                "payment_protocol": "x402",
+                "payment": payment
+            }
+
+    result = calculate_trust_score(
+        reputation=request.reputation,
+        successful_transactions=request.successful_transactions,
+        verified=request.verified,
+        price=request.price
+    )
+
+    response = {
+        "service": "AgentShield Analysis",
+        "analyzed": True,
+        "reputation": request.reputation,
+        "successful_transactions": request.successful_transactions,
+        "verified": request.verified,
+        "price": request.price,
+        "trust_score": result["trust_score"],
+        "risk_level": result["risk_level"],
+        "decision": result["decision"],
+        "payment_protocol": "x402"
+    }
+    if payment:
+        response["payment"] = payment
+
+    return response
+
+
 @app.post("/authorize")
 def authorize(request: AuthorizeRequest):
-
+    """
+    Evaluates whether a transaction should be authorized and records
+    audit ledger with optional blockchain settlement details.
+    """
     # 1. Calculate provider trust
     result = calculate_trust_score(
         reputation=request.reputation,
@@ -129,7 +221,28 @@ def authorize(request: AuthorizeRequest):
         amount=request.amount
     )
 
-    # 3. Save audit record
+    # 3. Reuse analyze settlement
+    payment = request.payment or skipped_payment(
+        "Settlement was not requested for this call.",
+        status="NOT_REQUESTED"
+    )
+
+    payment_status_value = "NOT_ATTEMPTED"
+    if payment.get("success"):
+        payment_status_value = "SETTLED"
+    elif payment.get("status") in {"FAILED", "SETTLEMENT_FAILED"}:
+        payment_status_value = "FAILED"
+    elif payment.get("status") in {
+        "WALLET_MISSING",
+        "WALLET_INVALID",
+        "NOT_CONFIGURED",
+        "NOT_REQUESTED"
+    }:
+        payment_status_value = payment["status"]
+
+    network = get_network_config()
+
+    # 4. Save audit record
     transaction_id = save_transaction(
         service=request.service,
         trust_score=result["trust_score"],
@@ -138,10 +251,13 @@ def authorize(request: AuthorizeRequest):
         amount=request.amount,
         payment_protocol="x402",
         authorized=decision["authorized"],
-        reason=decision["reason"]
+        reason=decision["reason"],
+        payment_status=payment_status_value,
+        blockchain=network["label"] if payment.get("transaction_id") else None,
+        blockchain_tx_id=payment.get("transaction_id")
     )
 
-    # 4. Return decision to frontend
+    # 5. Return decision and settlement to frontend
     return {
         "transaction_id": transaction_id,
         "service": request.service,
@@ -151,23 +267,13 @@ def authorize(request: AuthorizeRequest):
         "trust_score": result["trust_score"],
         "amount": request.amount,
         "reason": decision["reason"],
-        "payment_protocol": "x402"
+        "payment_protocol": "x402",
+        "payment": payment
     }
 
-@app.get("/health")
-def health():
-    return {
-        "status": "healthy"
-    }
-
-
-# -------------------------
-# Trust Engine
-# -------------------------
 
 @app.get("/trust")
 def get_trust():
-
     service = {
         "name": "Demo Weather API",
         "price": 0.001,
@@ -176,27 +282,16 @@ def get_trust():
         "verified": True
     }
 
-    # Calculate trust score
     score = 0
-
-    # Reputation contributes up to 40 points
     score += service["reputation"] * 0.4
-
-    # Transaction history contributes up to 20 points
     transaction_score = min(service["successful_transactions"] / 5, 20)
     score += transaction_score
-
-    # Verification contributes 20 points
     if service["verified"]:
         score += 20
-
-    # Low price contributes 20 points
     if service["price"] <= 0.001:
         score += 20
-
     score = round(score)
 
-    # Determine risk
     if score >= 80:
         risk_level = "LOW"
         decision = "APPROVE"
@@ -218,24 +313,22 @@ def get_trust():
         "payment_protocol": "x402",
         "decision": decision
     }
-# -------------------------
-# Transaction History
-# -------------------------
+
 
 @app.get("/transactions")
 def transactions():
     return {
         "transactions": get_transactions()
     }
+
+
 # -------------------------
-# Algorand Settlement
+# Native Algorand Settlement
 # -------------------------
 
 @app.post("/settle-algorand")
 def settle_algorand(amount: float = 0.001):
-
     result = send_algorand_payment(
         amount_algo=amount
     )
-
     return result
